@@ -1,0 +1,27 @@
+name: shadowmarket-settlement
+version: "1.0.0"
+
+triggers:
+  - type: evm_log
+    config:
+      chain_id: 11155111
+      contract_address: "${SHADOWMARKET_CONTRACT_ADDRESS}"
+      event_signature: "MarketExpired(uint256,string,uint256)"
+
+capabilities:
+  - type: http
+    config:
+      confidential: true
+  - type: evm_read
+    config:
+      chain_id: 11155111
+  - type: evm_write
+    config:
+      chain_id: 11155111
+      private_key_env: CRE_SIGNING_KEY
+
+environment:
+  - OPENROUTER_API_KEY
+  - SERPER_API_KEY
+  - SHADOWMARKET_CONTRACT_ADDRESS
+  - SEPOLIA_RPC_URL
