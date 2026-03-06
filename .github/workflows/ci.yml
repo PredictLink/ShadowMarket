@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "copilot/**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-contracts:
+    name: Contracts — Compile & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile contracts
+        run: npx hardhat compile
+
+      - name: Run contract tests
+        run: npx hardhat test
+
+  test-cre-workflow:
+    name: CRE Workflow — Build, Test, Simulate (Mock)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install CRE workflow dependencies
+        working-directory: cre-workflow
+        run: npm install
+
+      - name: Build CRE workflow
+        working-directory: cre-workflow
+        run: npm run build
+
+      - name: Run CRE simulation (deterministic mock)
+        working-directory: cre-workflow
+        run: npm run simulate:mock
+
+  build-frontend:
+    name: Frontend — Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm install
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+        env:
+          NEXT_PUBLIC_CHAIN_ID: "11155111"
+          NEXT_PUBLIC_SEPOLIA_RPC: "https://rpc.sepolia.org"

@@ -1,0 +1,38 @@
+name: CRE Live (Optional)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 1"
+
+jobs:
+  cre-live-smoke:
+    name: CRE Workflow — Live API Smoke
+    runs-on: ubuntu-latest
+    if: ${{ secrets.OPENROUTER_API_KEY != '' }}
+    env:
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
+      SHADOWMARKET_CONTRACT_ADDRESS: ${{ secrets.SHADOWMARKET_CONTRACT_ADDRESS }}
+      SEPOLIA_RPC_URL: ${{ secrets.SEPOLIA_RPC_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        working-directory: cre-workflow
+        run: npm install
+
+      - name: Build workflow
+        working-directory: cre-workflow
+        run: npm run build
+
+      - name: Run live simulation
+        working-directory: cre-workflow
+        run: npm run simulate:live
