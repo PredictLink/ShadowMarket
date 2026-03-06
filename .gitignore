@@ -1,0 +1,35 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Hardhat
+cache/
+artifacts/
+typechain-types/
+
+# TypeScript build outputs
+dist/
+build/
+*.js.map
+
+# Next.js
+frontend/.next/
+frontend/out/
+
+# Deployment artifacts (keep the directory, ignore generated files)
+deployments/*.json
+!deployments/.gitkeep
+
+# CRE workflow compiled output
+cre-workflow/dist/
+
+# Misc
+.DS_Store
+*.log
+coverage/

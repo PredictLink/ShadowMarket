@@ -1,0 +1,29 @@
+{
+  "name": "shadowmarket",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "contracts",
+    "cre-workflow",
+    "frontend",
+    "scripts"
+  ],
+  "scripts": {
+    "deploy:sepolia": "npx hardhat run scripts/deploy.ts --network sepolia",
+    "test:all": "npx hardhat test && cd cre-workflow && npm test",
+    "bootstrap": "npm install && npx hardhat compile && cd cre-workflow && npm install && npm run build && cd ../frontend && npm install",
+    "demo:setup": "npx ts-node scripts/demo-setup.ts",
+    "demo:settle": "npx ts-node scripts/manual-settle.ts",
+    "check-env": "npx ts-node scripts/check-env.ts"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "dotenv": "^16.4.5",
+    "hardhat": "^2.22.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.2"
+  }
+}
