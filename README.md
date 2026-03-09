@@ -20,7 +20,8 @@ Private prediction markets with sealed-bid privacy, commit-reveal integrity, and
 - [Script Reference](#script-reference)
 - [CRE Workflow Notes](#cre-workflow-notes)
 - [Frontend Notes](#frontend-notes)
-- [Current Deployment Info](#current-deployment-info)
+- [Deployed Addresses](#deployed-addresses)
+- [Chainlink Usage](#chainlink-usage)
 - [Troubleshooting](#troubleshooting)
 - [Security Notes](#security-notes)
 - [License](#license)
@@ -378,7 +379,6 @@ Current `cre-workflow/src` files include multiple settlement/runtime variants an
 ## Frontend Notes
 
 - Next.js app is in `frontend/`.
-- Several route screens currently use mock/demo data and simulated actions.
 - Reusable contract hooks and crypto helpers are present in `frontend/lib/` for real wallet interactions.
 
 ### Frontend commands
@@ -393,7 +393,7 @@ npm run start
 
 ---
 
-## Current Deployment Info
+## Deployed Addresses
 
 From `deployments/sepolia.json`:
 
@@ -409,29 +409,16 @@ Contract constant in production `ShadowMarket.sol`:
 
 ---
 
-## Troubleshooting
+## Chainlink Usage
 
-### `PRIVATE_KEY not set` / `SHADOWMARKET_CONTRACT_ADDRESS not set`
+ShadowMarket actively uses the **Chainlink Confidential Runtime Environment (CRE)** to trustlessly resolve prediction market outcomes via AI consensus. 
 
-- Ensure root `.env` exists and is loaded in your command context.
+When a market expires, the contract emits a `MarketExpired` event, which triggers the off-chain Chainlink CRE workflow. This workflow uses confidential HTTP capabilities to perform search grounding (fetching real-world data like historical crypto prices via the Serper API) and passes this context to dual LLM models (Gemini Flash & Claude via OpenRouter) to determine the outcome. Once consensus is reached, the CRE encodes a payload and securely writes the settlement report back on-chain.
 
-### `MarketExpiredError` when submitting bids
-
-- Market expiry has passed or market already transitioned from `OPEN`.
-
-### `CommitmentMismatch` on reveal
-
-- Salt, amount, or side do not match original commit hash.
-- Ensure hash used `abi.encode(amount, side, salt)` with `bytes32` salt.
-
-### `NotAuthorizedSettler`
-
-- Caller must be `authorizedSettler` (or owner for `settleMarket` in `ShadowMarket.sol`).
-- Set via `setAuthorizedSettler(address)` as owner.
-
-### Frontend not showing markets
-
-- Check `NEXT_PUBLIC_SHADOWMARKET_ADDRESS` and `NEXT_PUBLIC_SEPOLIA_RPC`.
+You can view the specific Chainlink CRE implementation logic here:
+- **CRE Workflow Definition**: [workflow.yaml](https://github.com/PredictLink/ShadowMarket/blob/main/cre-workflow/workflow.yaml)
+- **EVM Trigger & Execution**: [cre-workflow/src/workflow.ts](https://github.com/PredictLink/ShadowMarket/blob/main/cre-workflow/src/workflow.ts)
+- **AI Outcome Consensus Logic**: [cre-workflow/src/settlement.ts](https://github.com/PredictLink/ShadowMarket/blob/main/cre-workflow/src/settlement.ts)
 
 ---
 
